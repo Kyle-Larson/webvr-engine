@@ -1,17 +1,21 @@
 {
-  "name": "webvr-boilerplate",
-  "version": "0.4.6",
-  "description": "A starting point for web-based VR experiences that work in both Cardboard and Oculus.",
-  "main": "build/webvr-manager.js",
+  "name": "webvr-engine",
+  "version": "0.0.1",
+  "description": "A template for WebVR experiences",
+  "main": "build/browser/js/main",
   "directories": {
     "test": "test"
   },
   "dependencies": {
-    "webvr-polyfill": "^0.9.5",
+    "es6-promise": "latest",
     "three": "latest",
-    "es6-promise": "latest"
+    "webvr-boilerplate": "^0.4.6",
+    "webvr-polyfill": "^0.9.5"
   },
   "devDependencies": {
+    "babel-cli": "^6.14.0",
+    "babel-preset-es2015": "^6.14.0",
+    "babelify": "^7.3.0",
     "browserify": "latest",
     "derequire": "latest",
     "watchify": "latest"
