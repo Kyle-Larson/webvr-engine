@@ -4,7 +4,6 @@
   "description": "A template for WebVR experiences",
   "main": "build/browser/js/main",
   "directories": {
-    "test": "test"
   },
   "dependencies": {
     "es6-promise": "latest",
@@ -21,23 +20,20 @@
     "watchify": "latest"
   },
   "scripts": {
-    "build": "browserify src/webvr-manager.js --standalone WebVRManager | derequire > build/webvr-manager.js",
-    "watch": "watchify src/webvr-manager.js --standalone WebVRManager -v -d -o 'derequire > build/webvr-manager.js'",
-    "test": "browserify test/device-info-test.js  > build/device-info-test.js",
-    "copy-polyfill": "cp ../webvr-polyfill/build/webvr-polyfill.js node_modules/webvr-polyfill/build/webvr-polyfill.js",
-    "copy-three": "./scripts/copy-three.sh"
+    "build": "browserify js/main-scene.js -t babelify --outfile build/js/main-scene.js",
+    "watch": "watchify js/main-scene.js -t babelify --outfile build/js/main-scene.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/borismus/webvr-boilerplate.git"
+    "url": "git+https://github.com/Kyle-Larson/webvr-engine"
   },
   "keywords": [
     "vr"
   ],
-  "author": "Boris Smus",
+  "author": "Kyle Larson",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/borismus/webvr-boilerplate/issues"
+    "url": "https://github.com/Kyle-Larson/webvr-engine/issues"
   },
-  "homepage": "https://github.com/borismus/webvr-boilerplate#readme"
+  "homepage": "https://github.com/Kyle-Larson/webvr-engine"
 }
