@@ -1,0 +1,22 @@
+{
+	"skybox":{
+		"material":"#0f0"
+	},
+	"objects":[
+		{
+			"model":"cube.obj",
+			"material":"mat01.json",
+			"position":[0, 1.5, -1]
+		},
+		{
+			"model":"cube.file",
+			"material":"mat02.json",
+			"position":[1, 1.5, -1]
+		},
+		{
+			"model":"cube.file",
+			"material":"mat01.json",
+			"position":[-1, 1.5, -1]
+		}
+	]
+}

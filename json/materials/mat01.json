@@ -1,0 +1,7 @@
+{
+		"type":"basicmesh",
+        "params":{
+        	"map": "tex01.json",
+        	"color": "#c3e"
+       	}
+}
