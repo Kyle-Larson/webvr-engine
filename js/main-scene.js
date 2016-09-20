@@ -33,6 +33,8 @@ loadScene("Test-Scene-01", (data) => {
     side: THREE.BackSide
   });
 
+
+
   stage.setSkybox(new THREE.Mesh(geometry, material));
 
   data.objects.forEach((object, index, array) => {
@@ -68,6 +70,18 @@ loadScene("Test-Scene-01", (data) => {
     });
   });
 });
+  //fps display
+
+  /*var glAttribs = {
+          alpha: false,
+          antialias: !VRSamplesUtil.isMobile(),
+          preserveDrawingBuffer: preserveDrawingBuffer
+      };*/
+  var gl = stage.renderer.context;
+  //var textureLoader = new WGLUTextureLoader(gl);
+  var stats = new WGLUStats(gl);
+//
+
 
 // var cube = new SimObject(stage.scene);
 
@@ -80,9 +94,13 @@ loadScene("Test-Scene-01", (data) => {
 // simObjects.push(cube);
 
 function update(deltaTime) {
+  stats.begin();
   simObjects.forEach((object, index, array) => {
     object.update(deltaTime);
   });
+  //stats.render([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1], [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]);
+  stats.renderOrtho();
+  stats.end();
 }
 
 stage.setUpdateLoop(update); //

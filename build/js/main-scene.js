@@ -75,6 +75,18 @@ boxTexture.repeat.set(boxSize, boxSize);
     });
   });
 });
+//fps display
+
+/*var glAttribs = {
+        alpha: false,
+        antialias: !VRSamplesUtil.isMobile(),
+        preserveDrawingBuffer: preserveDrawingBuffer
+    };*/
+var gl = stage.renderer.context;
+//var textureLoader = new WGLUTextureLoader(gl);
+var stats = new WGLUStats(gl);
+//
+
 
 // var cube = new SimObject(stage.scene);
 
@@ -87,9 +99,13 @@ boxTexture.repeat.set(boxSize, boxSize);
 // simObjects.push(cube);
 
 function update(deltaTime) {
+  stats.begin();
   simObjects.forEach(function (object, index, array) {
     object.update(deltaTime);
   });
+  //stats.render([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1], [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]);
+  stats.renderOrtho();
+  stats.end();
 }
 
 stage.setUpdateLoop(update); //
