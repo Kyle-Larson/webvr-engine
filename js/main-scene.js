@@ -66,18 +66,17 @@ loadScene("Test-Scene-01", (data) => {
         simObjects.push(simObj);
       }
     });
+
+    simObjects[2].setOnCameracast(function() {
+      let geometry = this.getMesh().geometry;
+      let material = new THREE.MeshBasicMaterial({
+        color: (Math.random() * 0xFFFFFF<<0)
+      });
+
+      this.setMesh(new THREE.Mesh(geometry, material));
+    });
   });
 });
-
-// var cube = new SimObject(stage.scene);
-
-// var boxGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-// var boxMaterial = new THREE.MeshNormalMaterial();
-// cube.setMesh(new THREE.Mesh(boxGeometry, boxMaterial));
-
-// cube.position.set(0, stage.controls.userHeight, -1);
-
-// simObjects.push(cube);
 
 function update(deltaTime) {
   simObjects.forEach((object, index, array) => {

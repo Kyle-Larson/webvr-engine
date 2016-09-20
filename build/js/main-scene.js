@@ -1,6 +1,80 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _simObject = require('./sim-object');
+
+var _simObject2 = _interopRequireDefault(_simObject);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Camera = function (_SimObject) {
+  _inherits(Camera, _SimObject);
+
+  function Camera(scene) {
+    _classCallCheck(this, Camera);
+
+    var _this = _possibleConstructorReturn(this, (Camera.__proto__ || Object.getPrototypeOf(Camera)).call(this, scene));
+
+    _this.threeCam = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
+    _this.controls = new THREE.VRControls(_this.threeCam);
+    _this.controls.standing = true;
+
+    _this.raycaster = new THREE.Raycaster();
+    return _this;
+  }
+
+  _createClass(Camera, [{
+    key: 'onResize',
+    value: function onResize(e) {
+      this.threeCam.aspect = window.innerWidth / window.innerHeight;
+      this.threeCam.updateProjectionMatrix();
+    }
+  }, {
+    key: 'update',
+    value: function update(deltaTime) {
+      this.controls.update();
+    }
+  }, {
+    key: 'checkRaycast',
+    value: function checkRaycast(scene) {
+
+      this.raycaster.setFromCamera({ x: 0, y: 0 }, this.threeCam);
+
+      var intersects = this.raycaster.intersectObjects(scene.children, true);
+
+      intersects.forEach(function (object) {
+        if (object.object instanceof _simObject2.default && object.object.inView) {
+          object.object.inView();
+        }
+        object.object.traverseAncestors(function (obj) {
+          if (obj instanceof _simObject2.default && obj.inView) {
+            obj.inView();
+          }
+        });
+      });
+    }
+  }]);
+
+  return Camera;
+}(_simObject2.default);
+
+exports.default = Camera;
+
+},{"./sim-object":4}],2:[function(require,module,exports){
+'use strict';
+
 var _stage = require('./stage');
 
 var _stage2 = _interopRequireDefault(_stage);
@@ -73,18 +147,17 @@ boxTexture.repeat.set(boxSize, boxSize);
         simObjects.push(simObj);
       }
     });
+
+    simObjects[2].setOnCameracast(function () {
+      var geometry = this.getMesh().geometry;
+      var material = new THREE.MeshBasicMaterial({
+        color: Math.random() * 0xFFFFFF << 0
+      });
+
+      this.setMesh(new THREE.Mesh(geometry, material));
+    });
   });
 });
-
-// var cube = new SimObject(stage.scene);
-
-// var boxGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-// var boxMaterial = new THREE.MeshNormalMaterial();
-// cube.setMesh(new THREE.Mesh(boxGeometry, boxMaterial));
-
-// cube.position.set(0, stage.controls.userHeight, -1);
-
-// simObjects.push(cube);
 
 function update(deltaTime) {
   simObjects.forEach(function (object, index, array) {
@@ -96,7 +169,7 @@ stage.setUpdateLoop(update); //
 
 requestAnimationFrame(stage.update.bind(stage));
 
-},{"./scene-loader":2,"./sim-object":3,"./stage":4}],2:[function(require,module,exports){
+},{"./scene-loader":3,"./sim-object":4,"./stage":5}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -112,7 +185,7 @@ function loadScene(sceneFile, onLoad) {
   oReq.send();
 }
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -137,6 +210,7 @@ var SimObject = function (_THREE$Object3D) {
 
     scene.add(_this);
     _this.updateFunc = null;
+    _this.cameracast = null;
     _this.add(new THREE.Object3D());
     return _this;
   }
@@ -158,6 +232,11 @@ var SimObject = function (_THREE$Object3D) {
       this.updateFunc = func;
     }
   }, {
+    key: "setOnCameracast",
+    value: function setOnCameracast(func) {
+      this.cameracast = func;
+    }
+  }, {
     key: "update",
     value: function update(deltaTime) {
       if (this.updateFunc) {
@@ -171,7 +250,7 @@ var SimObject = function (_THREE$Object3D) {
 
 exports.default = SimObject;
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -179,6 +258,12 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _camera = require('./camera');
+
+var _camera2 = _interopRequireDefault(_camera);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -192,10 +277,9 @@ var Stage = function () {
     this.lastRender = 0;
 
     document.body.appendChild(this.renderer.domElement);
+    this.renderer.domElement.addEventListener('touchstart', this.onTouch.bind(this), false);
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
-    this.controls = new THREE.VRControls(this.camera);
-    this.controls.standing = true;
+    this.camera = new _camera2.default(this.scene);
     this.effect = new THREE.VREffect(this.renderer);
     this.effect.setSize(window.innerWidth, window.innerHeight);
 
@@ -241,9 +325,8 @@ var Stage = function () {
   }, {
     key: 'onResize',
     value: function onResize(e) {
+      this.camera.onResize(e);
       this.effect.setSize(window.innerWidth, window.innerHeight);
-      this.camera.aspect = window.innerWidth / window.innerHeight;
-      this.camera.updateProjectionMatrix();
     }
   }, {
     key: 'update',
@@ -253,8 +336,8 @@ var Stage = function () {
 
       this.updateLoop(deltaTime);
 
-      this.controls.update();
-      this.manager.render(this.scene, this.camera, timestamp);
+      this.camera.update(deltaTime);
+      this.manager.render(this.scene, this.camera.threeCam, timestamp);
 
       requestAnimationFrame(this.update.bind(this));
     }
@@ -263,6 +346,14 @@ var Stage = function () {
     value: function setUpdateLoop(func) {
       this.updateLoop = func;
     }
+  }, {
+    key: 'onTouch',
+    value: function onTouch(evt) {
+      evt.preventDefault();
+      console.log("Canvas touched!");
+
+      this.camera.checkRaycast(this.scene);
+    }
   }]);
 
   return Stage;
@@ -270,4 +361,4 @@ var Stage = function () {
 
 exports.default = Stage;
 
-},{}]},{},[1]);
+},{"./camera":1}]},{},[2]);

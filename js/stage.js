@@ -1,3 +1,5 @@
+import Camera from './camera';
+
 class Stage {
   constructor() {
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -6,10 +8,9 @@ class Stage {
     this.lastRender = 0;
 
     document.body.appendChild(this.renderer.domElement);
+    this.renderer.domElement.addEventListener('touchstart', this.onTouch.bind(this), false);
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
-    this.controls = new THREE.VRControls(this.camera);
-    this.controls.standing = true;
+    this.camera = new Camera(this.scene);
     this.effect = new THREE.VREffect(this.renderer);
     this.effect.setSize(window.innerWidth, window.innerHeight);
 
@@ -52,9 +53,8 @@ class Stage {
   }
 
   onResize(e) {
+    this.camera.onResize(e);
     this.effect.setSize(window.innerWidth, window.innerHeight);
-    this.camera.aspect = window.innerWidth / window.innerHeight;
-    this.camera.updateProjectionMatrix();
   }
 
   update(timestamp) {
@@ -63,14 +63,21 @@ class Stage {
 
     this.updateLoop(deltaTime);
 
-    this.controls.update();
-    this.manager.render(this.scene, this.camera, timestamp);
+    this.camera.update(deltaTime);
+    this.manager.render(this.scene, this.camera.threeCam, timestamp);
 
     requestAnimationFrame(this.update.bind(this));
   }
 
   setUpdateLoop(func) {
     this.updateLoop = func;
+  }
+
+  onTouch(evt) {
+    evt.preventDefault();
+    console.log("Canvas touched!");
+
+    this.camera.checkRaycast(this.scene);
   }
 }
 

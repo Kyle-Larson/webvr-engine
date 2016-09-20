@@ -3,6 +3,7 @@ class SimObject extends THREE.Object3D {
     super();
     scene.add(this);
     this.updateFunc = null;
+    this.cameracast = null;
     this.add(new THREE.Object3D());
   }
 
@@ -17,6 +18,10 @@ class SimObject extends THREE.Object3D {
 
   setUpdate(func) {
     this.updateFunc = func;
+  }
+
+  setOnCameracast(func) {
+    this.cameracast = func;
   }
 
   update(deltaTime) {
