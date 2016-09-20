@@ -55,12 +55,12 @@ var Camera = function (_SimObject) {
       var intersects = this.raycaster.intersectObjects(scene.children, true);
 
       intersects.forEach(function (object) {
-        if (object.object instanceof _simObject2.default && object.object.inView) {
-          object.object.inView();
+        if (object.object instanceof _simObject2.default && object.object.cameracast) {
+          object.object.cameracast();
         }
         object.object.traverseAncestors(function (obj) {
-          if (obj instanceof _simObject2.default && obj.inView) {
-            obj.inView();
+          if (obj instanceof _simObject2.default && obj.cameracast) {
+            obj.cameracast();
           }
         });
       });

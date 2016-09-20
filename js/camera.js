@@ -27,13 +27,13 @@ class Camera extends SimObject {
 
     intersects.forEach((object) => {
       if(object.object instanceof SimObject &&
-      object.object.inView) {
-        object.object.inView();
+      object.object.cameracast) {
+        object.object.cameracast();
       }
       object.object.traverseAncestors((obj) => {
         if(obj instanceof SimObject &&
-        obj.inView) {
-          obj.inView();
+        obj.cameracast) {
+          obj.cameracast();
         }
       });
     })
